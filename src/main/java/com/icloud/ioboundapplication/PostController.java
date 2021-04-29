@@ -24,6 +24,7 @@ public class PostController {
 
     private final PostRepository postRepository;
     private final ModelMapper mapper;
+    private final PostCacheService postCacheService;
 
     private final Producer producer;
     private final ObjectMapper objectMapper;
@@ -50,17 +51,24 @@ public class PostController {
     /* 2. 글 목록을 페이징하여 반환 */
     @GetMapping("/posts")
     public ResponseEntity<Page<PostDto>> getPostList(@RequestParam(defaultValue = "1") Integer page) {
-        Page<Post> result = postRepository.findAll(
-                PageRequest.of(page - 1, PAGE_SIZE, Sort.by("id").descending())
-        );
+        if (page.equals(1)) {
+            Page<PostDto> firstPostPage = postCacheService.getFirstPostPage();
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(firstPostPage);
+        } else {
+            Page<Post> result = postRepository.findAll(
+                    PageRequest.of(page - 1, PAGE_SIZE, Sort.by("id").descending())
+            );
 
-        List<PostDto> collect = result.getContent()
-                .stream().map(post -> mapper.map(post, PostDto.class))
-                .collect(Collectors.toList());
+            List<PostDto> collect = result.getContent()
+                    .stream().map(post -> mapper.map(post, PostDto.class))
+                    .collect(Collectors.toList());
 
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(new PageImpl<>(collect));
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(new PageImpl<>(collect));
+        }
     }
 
     /* 3. 글 번호로 조회 */
