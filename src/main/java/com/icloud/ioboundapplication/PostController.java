@@ -1,6 +1,9 @@
 package com.icloud.ioboundapplication;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -16,21 +19,32 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class PostController {
 
     private final PostRepository postRepository;
     private final ModelMapper mapper;
+
+    private final Producer producer;
+    private final ObjectMapper objectMapper;
 
     private static final Integer PAGE_SIZE = 20;
 
     /* 1. 글을 작성한다. */
     @PostMapping("/post")
     public ResponseEntity<PostDto> createPost(@RequestBody PostDto postDto) {
-        Post savedPost = postRepository.save(mapper.map(postDto, Post.class));
-        PostDto result = mapper.map(savedPost, PostDto.class);
+        Post post = mapper.map(postDto, Post.class);
+        String jsonPost = null;
+        try {
+            jsonPost = objectMapper.writeValueAsString(post);
+            producer.sendTo(jsonPost);
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
+        }
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(result);
+                .body(postDto);
     }
 
     /* 2. 글 목록을 페이징하여 반환 */
