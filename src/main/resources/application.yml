@@ -1,10 +1,16 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgresql
+    url: jdbc:postgresql://10.140.0.5:5432/postgresql
     username: postgresql
     password: postgrespassword
   jpa:
-    show-sql: true
     hibernate:
       dialect: org.hibernate.dialect.PostgreSQLDialect
       ddl-auto: update
+
+    properties:
+      hibernate:
+        format_sql: true
+
+logging.level:
+  org.hibernate.SQL: debug

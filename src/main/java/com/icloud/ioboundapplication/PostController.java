@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,6 +30,7 @@ public class PostController {
     }
 
     /* 2-1. 글 목록을 조회한다. */
+    @GetMapping("/posts")
     public ResponseEntity<List<PostDto>> getPostList() {
         List<PostDto> collect = postRepository.findAll()
                 .stream().map(post -> mapper.map(post, PostDto.class))
