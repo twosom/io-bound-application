@@ -11,7 +11,7 @@ spring:
 
     properties:
       hibernate:
-        format_sql: false
+        format_sql: true
   rabbitmq:
     host: 10.146.0.2
     username: guest
