@@ -74,7 +74,7 @@ public class PostController {
     /* 5. 적합한 테스트를 위해 모든 데이터 제거 */
     @DeleteMapping("/delete_all")
     public ResponseEntity<String> deleteAll() {
-        postRepository.deleteAll();
+        postRepository.deleteAllInBatch();
 
         return ResponseEntity
                 .status(HttpStatus.OK)
