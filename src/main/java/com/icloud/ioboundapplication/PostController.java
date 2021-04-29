@@ -60,6 +60,15 @@ public class PostController {
     }
 
     /* 4. 글 내용으로 검색 -> 해당 내용이 포함된 모든 글 */
+    @GetMapping("/search")
+    public ResponseEntity<List<PostDto>> findPostsByContent(@RequestParam String content) {
+        List<PostDto> collect = postRepository.findByContentContains(content)
+                .stream().map(post -> mapper.map(post, PostDto.class))
+                .collect(Collectors.toList());
 
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(collect);
+    }
 
 }
