@@ -13,7 +13,7 @@ spring:
       hibernate:
         format_sql: true
   rabbitmq:
-    host: localhost
+    host: 10.146.0.2
     username: guest
     password: guest
     port: 5672
