@@ -49,9 +49,15 @@ public class PostController {
                 .body(new PageImpl<>(collect));
     }
 
-
-
     /* 3. 글 번호로 조회 */
+    @GetMapping("/post/{id}")
+    public ResponseEntity<PostDto> getPostById(@PathVariable("id") Long id) {
+        PostDto findPost = mapper.map(postRepository.findById(id)
+                .orElse(new Post(Long.MIN_VALUE, "해당하는 게시글이 존재하지 않습니다. 게시글 id = " + id)), PostDto.class);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(findPost);
+    }
 
     /* 4. 글 내용으로 검색 -> 해당 내용이 포함된 모든 글 */
 
