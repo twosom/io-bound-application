@@ -11,12 +11,12 @@ spring:
 
     properties:
       hibernate:
-#        format_sql: true
+        format_sql: true
   rabbitmq:
     host: 10.178.0.22
     username: guest
     password: guest
     port: 5672
 
-#logging.level:
-#  org.hibernate.SQL: debug
+logging.level:
+  org.hibernate.SQL: debug
