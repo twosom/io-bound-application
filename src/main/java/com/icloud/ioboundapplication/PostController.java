@@ -50,9 +50,9 @@ public class PostController {
 
     /* 2. 글 목록을 페이징하여 반환 */
     @GetMapping("/posts")
-    public ResponseEntity<Page<PostDto>> getPostList(@RequestParam(defaultValue = "1") Integer page) {
+    public ResponseEntity<Page<Post>> getPostList(@RequestParam(defaultValue = "1") Integer page) {
         if (page.equals(1)) {
-            Page<PostDto> firstPostPage = postCacheService.getFirstPostPage();
+            Page<Post> firstPostPage = postCacheService.getFirstPostPage();
             return ResponseEntity
                     .status(HttpStatus.OK)
                     .body(firstPostPage);
@@ -60,14 +60,9 @@ public class PostController {
             Page<Post> result = postRepository.findAll(
                     PageRequest.of(page - 1, PAGE_SIZE, Sort.by("id").descending())
             );
-
-            List<PostDto> collect = result.getContent()
-                    .stream().map(post -> mapper.map(post, PostDto.class))
-                    .collect(Collectors.toList());
-
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(new PageImpl<>(collect));
+                    .body(result);
         }
     }
 

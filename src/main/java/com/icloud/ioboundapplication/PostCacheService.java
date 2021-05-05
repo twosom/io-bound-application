@@ -21,7 +21,7 @@ public class PostCacheService {
     private final PostRepository postRepository;
     private final ModelMapper mapper;
 
-    private Page<PostDto> firstPostPage;
+    private Page<Post> firstPostPage;
 
     @Scheduled(cron = "* * * * * *")
     public void updateFirstPostPage() {
@@ -29,10 +29,7 @@ public class PostCacheService {
                 PageRequest.of(0, 20, Sort.by("id").descending())
         );
 
-        List<PostDto> result = postList.getContent()
-                .stream().map(post -> mapper.map(post, PostDto.class))
-                .collect(Collectors.toList());
 
-        firstPostPage = new PageImpl<>(result);
+        firstPostPage = postList;
     }
 }
