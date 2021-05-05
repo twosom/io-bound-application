@@ -95,7 +95,7 @@ public class PostController {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body("All Data Deleted");
+                .body("All Data Deleted!");
     }
 
 }
