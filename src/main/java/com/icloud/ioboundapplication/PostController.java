@@ -2,6 +2,9 @@ package com.icloud.ioboundapplication;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -83,17 +86,24 @@ public class PostController {
 
     /* 4. 글 내용으로 검색 -> 해당 내용이 포함된 모든 글 */
     @GetMapping("/search")
-    public ResponseEntity<List<PostDto>> findPostsByContent(@RequestParam String content) {
+    public ResponseEntity<Result<List<PostDto>>> findPostsByContent(@RequestParam String content) {
         List<PostDto> collect = postRepository.findByContentContains(content)
                 .stream().map(post -> mapper.map(post, PostDto.class))
                 .collect(Collectors.toList());
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(collect);
+                .body(new Result<>(collect.size(), collect));
     }
 
+    @Data
+    @AllArgsConstructor @NoArgsConstructor
+    static class Result<E> {
+        private int count;
+        private E data;
+    }
     /* 5. 적합한 테스트를 위해 모든 데이터 제거 */
+
     @DeleteMapping("/delete_all")
     public ResponseEntity<String> deleteAll() {
         postRepository.deleteAllInBatch();
@@ -102,5 +112,6 @@ public class PostController {
                 .status(HttpStatus.OK)
                 .body("All Data Deleted");
     }
+
 
 }
