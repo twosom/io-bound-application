@@ -27,12 +27,8 @@ public class PostController {
 
     private final PostRepository postRepository;
     private final ModelMapper mapper;
-    private final PostCacheService postCacheService;
-
     private final Producer producer;
     private final ObjectMapper objectMapper;
-
-    private static final Integer PAGE_SIZE = 20;
 
     /* 1. 글을 작성한다. */
     @PostMapping("/post")
@@ -51,38 +47,13 @@ public class PostController {
                 .body(postDto);
     }
 
-    /* 2. 글 목록을 페이징하여 반환 */
-    @GetMapping("/posts")
-    public ResponseEntity<Page<Post>> getPostList(@RequestParam(defaultValue = "1") Integer page) {
-        if (page.equals(1)) {
-            Page<Post> firstPostPage = postCacheService.getFirstPostPage();
-            return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body(firstPostPage);
-        } else {
-            Page<Post> result = postRepository.findAll(
-                    PageRequest.of(page - 1, PAGE_SIZE, Sort.by("id").descending())
-            );
-            return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body(result);
-        }
-    }
 
-    /* 3. 글 번호로 조회 */
-    @GetMapping("/post/{id}")
-    public ResponseEntity<PostDto> getPostById(@PathVariable("id") Long id) {
-        PostDto findPost = mapper.map(postRepository.findById(id)
-                .orElse(new Post(Long.MIN_VALUE, "해당하는 게시글이 존재하지 않습니다. 게시글 id = " + id)), PostDto.class);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(findPost);
-    }
+
 
     /* 4. 글 내용으로 검색 -> 해당 내용이 포함된 모든 글 */
     @GetMapping("/search")
     public ResponseEntity<Result<List<PostDto>>> findPostsByContent(@RequestParam String content) {
-        List<PostDto> collect = postRepository.findByContentContains(content)
+        List<PostDto> collect = postRepository.findByContent(content)
                 .stream().map(post -> mapper.map(post, PostDto.class))
                 .collect(Collectors.toList());
 
@@ -97,16 +68,5 @@ public class PostController {
         private int count;
         private E data;
     }
-    /* 5. 적합한 테스트를 위해 모든 데이터 제거 */
-
-    @DeleteMapping("/delete_all")
-    public ResponseEntity<String> deleteAll() {
-        postRepository.deleteAllInBatch();
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body("All Data Deleted!");
-    }
-
 
 }
